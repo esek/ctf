@@ -38,4 +38,6 @@ from main.decorators import MODULE_TASKS
 
 for module, tasks in MODULE_TASKS.items():
     for task in tasks:
-        urlpatterns.append(path(f"{module}/{task[1]}", view=task[2], name=task[0]))
+        urlpatterns.append(
+            path(f"{module}/{task.slug}", view=task.view, name=task.name)
+        )

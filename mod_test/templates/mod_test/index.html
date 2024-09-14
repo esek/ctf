@@ -3,6 +3,8 @@
 {% block content %}
 
 {% load task %}
+
+{% markdown task.desc %}
 {% terminal task user "test_program" %}
 
 {% endblock %}

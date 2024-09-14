@@ -22,13 +22,15 @@ class TaskModule(models.Model):
 class Task(models.Model):
     name = models.CharField(max_length=500, null=False, unique=True)
     slug = models.SlugField(max_length=500, null=False, unique=True)
+    url = models.CharField(max_length=500)
 
     points = models.PositiveSmallIntegerField(
         validators=[MaxValueValidator(MAX_TASK_POINTS)]
     )
-    module = models.ForeignKey(TaskModule, on_delete=models.CASCADE)
-    url = models.CharField(max_length=500)
 
+    desc = models.TextField(blank=True)
+
+    module = models.ForeignKey(TaskModule, on_delete=models.CASCADE)
     secret = TaskSecretField()
 
     def __str__(self) -> str:
