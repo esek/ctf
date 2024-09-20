@@ -1,25 +1,45 @@
 import functools
 from django.utils.text import slugify
 
-from .common import task_view_wrapper
-
-MODULE_TASKS = {}
+from .common import task_view_wrapper, get_module_key
 
 
-def define_task(name):
+class TaskDesc:
+    """Defines a task registered within the system"""
+
+    def __init__(
+        self, name: str, slug: str, wrapped_view, module: str, desc=None | str
+    ) -> None:
+        self.name = name
+        self.slug = slug
+        self.view = wrapped_view
+        self.module = module
+        self.desc = desc
+
+    def top_level_module(self):
+        return get_module_key(self.module)
+
+
+MODULE_TASKS: dict[str, TaskDesc] = {}
+
+
+def define_task(name, desc=None | str):
+    """Defines a new task associated to the decorated view."""
+
     def decorator(view):
         functools.wraps(view)
-        key = view.__module__.split(".")[0]
-        slug = slugify(name)
 
+        slug = slugify(name)
         wrapped_view = task_view_wrapper(view, slug)
 
-        tup = (name, slug, wrapped_view)
+        task = TaskDesc(name, slug, wrapped_view, view.__module__, desc)
+
+        key = task.top_level_module()
 
         if key not in MODULE_TASKS:
-            MODULE_TASKS[key] = [tup]
+            MODULE_TASKS[key] = [task]
         else:
-            MODULE_TASKS[key].append(tup)
+            MODULE_TASKS[key].append(task)
 
         return wrapped_view
 

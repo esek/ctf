@@ -6,6 +6,10 @@ from main.models import Task, TaskAttempt
 from main.forms import SecretForm
 
 
+def get_module_key(module):
+    return module.split(".")[0]
+
+
 def fetch_ctf_modules(additional_flag=None):
     """Fetches all django apps with modules installed within them."""
 
