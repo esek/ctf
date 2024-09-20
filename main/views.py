@@ -13,9 +13,8 @@ def index(request: HttpRequest):
 
 
 def tasks(request: HttpRequest):
-    context = get_base_context(request)
-
     if request.user.is_authenticated:
+        context = get_base_context(request)
         return render(request, "main/index.html", context)
     else:
         return redirect("enter")
