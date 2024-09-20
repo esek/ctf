@@ -4,7 +4,9 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login, logout as logout_user
 
 from .common import get_base_context
+from .decorators import TaskDesc
 from .forms import EnterForm
+from .models import Task, TaskClue, TaskAttempt
 
 
 # Create your views here.
@@ -53,3 +55,35 @@ def enter(request: HttpRequest):
 def logout(request: HttpRequest):
     logout_user(request)
     return HttpResponseRedirect("/enter")
+
+
+def config_hints_view(task_desc: TaskDesc):
+    def hints(request: HttpRequest):
+        task = Task.objects.get(slug=task_desc.slug)
+
+        context = get_base_context(request, True)
+        context["task"] = task
+
+        task_clue_count = TaskClue.objects.filter(task=task).count()
+
+        try:
+            attempt = TaskAttempt.objects.get(task=task, user=request.user)
+        except TaskAttempt.DoesNotExist:
+            attempt = None
+
+        if request.method == "POST":
+            if attempt.clue_count < task_clue_count:
+                attempt.clue_count = attempt.clue_count + 1
+                attempt.save()
+
+        if attempt is not None:
+            clues = TaskClue.objects.filter(task=task).order_by("index")[
+                : attempt.clue_count
+            ]
+
+            context["clues"] = [clue.clue for clue in clues]
+            context["clues_available"] = attempt.clue_count < task_clue_count
+
+        return render(request, "main/clues.html", context)
+
+    return hints
