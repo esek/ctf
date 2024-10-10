@@ -27,6 +27,7 @@ urlpatterns = [
 
 # Import and register all task views in installed CTF modules.
 from main.common import fetch_ctf_modules
+from main.views import config_hints_view
 
 ctf_modules = fetch_ctf_modules()
 
@@ -40,4 +41,13 @@ for module, tasks in MODULE_TASKS.items():
     for task in tasks:
         urlpatterns.append(
             path(f"{module}/{task.slug}", view=task.view, name=task.name)
+        )
+
+        # Add the corresponding hints page for the task.
+        urlpatterns.append(
+            path(
+                f"{module}/{task.slug}/hints",
+                view=config_hints_view(task),
+                name=f"{task.name}_hints",
+            )
         )

@@ -82,7 +82,7 @@
 
     {% if task %}
     <div class="secret">
-        {% if not task_attempt.passed %}
+        {% if not task_attempt.passed and secret_form %}
         <form action="" method="post">
             {% csrf_token %}
             {{ secret_form }}

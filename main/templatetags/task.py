@@ -1,8 +1,7 @@
 from markdown import Markdown
-
 from django import template
-from django.template.defaultfilters import stringfilter
-from django.utils.safestring import mark_safe
+
+from ..markdown import CTFExtension
 
 register = template.Library()
 
@@ -14,5 +13,5 @@ def terminal(task, user, program):
 
 @register.inclusion_tag("main/markdown.html")
 def markdown(markup):
-    md = Markdown()
+    md = Markdown(extensions=["codehilite", "fenced_code", CTFExtension()])
     return {"converted": md.convert(markup)}

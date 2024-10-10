@@ -8,13 +8,20 @@ class TaskDesc:
     """Defines a task registered within the system"""
 
     def __init__(
-        self, name: str, slug: str, wrapped_view, module: str, desc=None | str
+        self,
+        name: str,
+        slug: str,
+        wrapped_view,
+        module: str,
+        desc: None | str = None,
+        clues: None | str = None,
     ) -> None:
         self.name = name
         self.slug = slug
         self.view = wrapped_view
         self.module = module
         self.desc = desc
+        self.clues = clues
 
     def top_level_module(self):
         return get_module_key(self.module)
@@ -23,7 +30,7 @@ class TaskDesc:
 MODULE_TASKS: dict[str, TaskDesc] = {}
 
 
-def define_task(name, desc=None | str):
+def define_task(name, desc: None | str = None, clues: None | str = None):
     """Defines a new task associated to the decorated view."""
 
     def decorator(view):
@@ -32,7 +39,7 @@ def define_task(name, desc=None | str):
         slug = slugify(name)
         wrapped_view = task_view_wrapper(view, slug)
 
-        task = TaskDesc(name, slug, wrapped_view, view.__module__, desc)
+        task = TaskDesc(name, slug, wrapped_view, view.__module__, desc, clues)
 
         key = task.top_level_module()
 

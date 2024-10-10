@@ -1,9 +1,19 @@
 #terminal {
     background-color: grey;
-    width: 50%;
-    height: 50%;
+    width: 90%;
+    height: 90%;
     color: greenyellow;
     overflow: scroll;
     border-radius: 10px;
     padding: 0.5%;
+}
+
+.task {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 1%;
+    padding-bottom: 1%;
+    padding-left: 10%;
+    padding-right: 10%;
 }
