@@ -1,4 +1,5 @@
 import ast
+from black import format
 
 
 def load_ast_tree(file):
@@ -12,18 +13,25 @@ def write_ast_tree(file, tree):
     """Writes the ast tree generated python code back into the file"""
     with open(file, "w") as f:
         contents = ast.unparse(tree)
+        format()
         f.write(contents)
 
 
 def patch_module(module_path, title, use_makefile):
     """Applies some CTF related patches to the generated Django app"""
-    apps_file = f"{module_path}/apps.py"
-    tree = load_ast_tree(apps_file)
 
-    tree = AppsPatch(title, use_makefile).visit(tree)
-    tree = ast.fix_missing_locations(tree)
+    def patch_file(submodule, patches, root=False):
+        source_file = f"{module_path if root is False else 'ctf'}/{submodule}.py"
+        tree = load_ast_tree(source_file)
 
-    write_ast_tree(apps_file, tree)
+        for patch in patches:
+            tree = patch.visit(tree)
+
+        tree = ast.fix_missing_locations(tree)
+        write_ast_tree(source_file, tree)
+
+    patch_file("apps", [AppsPatch(title, use_makefile)])
+    patch_file("settings", [SettingsPatch()], True)
 
 
 class AppsPatch(ast.NodeTransformer):
@@ -64,4 +72,12 @@ class AppsPatch(ast.NodeTransformer):
             # Add the new field to the class
             node.body.append(use_makefile)
 
+        return node
+
+
+class SettingsPatch(ast.NodeTransformer):
+    def visit_Name(self, node: ast.Name):
+        print(node.id)
+        self.generic_visit(node)
+        
         return node
