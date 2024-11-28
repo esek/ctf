@@ -16,7 +16,7 @@ def fetch_ctf_modules(additional_flag=None):
     def check(config):
         try:
             return config.has_tasks and (
-                True if additional_flag is None else config.additional_flag
+                True if additional_flag is None else getattr(config, additional_flag)
             )
         except AttributeError:
             return False
