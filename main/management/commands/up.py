@@ -23,6 +23,7 @@ class Command(BaseCommand):
                 # Get pre-built image for module
                 image = client.images.get(f"ctf/{module.name}_env")
                 # Create container for image
-                client.containers.run(image, name=f"ctf_{module.name}_env")
+                # Note "Detach" to continue python code execution i.e. fire and forget.
+                client.containers.run(image, name=f"ctf_{module.name}_env", detach=True)
             except docker.errors.ImageNotFound:
                 print(f"No pre-built image was found for {module.name}")

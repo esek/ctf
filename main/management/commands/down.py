@@ -22,6 +22,7 @@ class Command(BaseCommand):
             try:
                 # Create container for image
                 container = client.containers.get(f"ctf_{module.name}_env")
+                container.stop()
                 container.remove(v=True)
             except docker.errors.NotFound:
                 print(f"No container online for module {module.name}")
