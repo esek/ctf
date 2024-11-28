@@ -33,7 +33,6 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     "daphne",
-    "c_memory_hijinks.apps.CMemoryHijinks",
     "main.apps.MainConfig",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -41,6 +40,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "revproxy.apps.RevProxyConfig",
+    "c_memory_hijinks.apps.CMemoryHijinks",
 ]
 
 MIDDLEWARE = [

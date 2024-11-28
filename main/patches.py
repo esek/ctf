@@ -17,7 +17,7 @@ def write_cst(file, tree):
         f.write(contents)
 
 
-def patch_module(module_path, title, use_makefile):
+def patch_module(module_path, title, use_makefile, use_dockerfile):
     """Applies some CTF related patches to the generated Django app"""
 
     def patch_file(submodule, patches, root=False):
@@ -29,7 +29,7 @@ def patch_module(module_path, title, use_makefile):
 
         write_cst(source_file, tree)
 
-    patch_file("apps", [AppsPatch(title, use_makefile)])
+    patch_file("apps", [AppsPatch(title, use_makefile, use_dockerfile)])
     patch_file("views", [ViewsPatch()])
     patch_file("settings", [SettingsPatch(module_path)], True)
 
@@ -45,11 +45,12 @@ class ViewsPatch(cst.CSTTransformer):
 class AppsPatch(cst.CSTTransformer):
     """Adds some CTF specific fields to the create Django app config belonging to the task module."""
 
-    def __init__(self, title, use_makefile) -> None:
+    def __init__(self, title, use_makefile, use_dockerfile) -> None:
         super().__init__()
 
         self.title = str(title)
         self.use_makefile = use_makefile
+        self.use_dockerfile = use_dockerfile
 
     def leave_ClassDef(self, original_node: cst.ClassDef, updated_node: cst.ClassDef):
         # Creates the 'has_tasks' variable
@@ -67,6 +68,12 @@ class AppsPatch(cst.CSTTransformer):
 
             # Add the new field to the class
             variables.append(use_makefile)
+        if self.use_dockerfile:
+            # Creates the 'use_docker' field if the module uses a dockerfile.
+            use_docker = cst.parse_statement(f"use_docker = {True}")
+
+            # Add the new field to the class
+            variables.append(use_docker)
 
         # Add variables to class definition.
         updated_body = updated_node.body.with_changes(

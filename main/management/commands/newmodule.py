@@ -28,14 +28,23 @@ class Command(BaseCommand):
         title = prompt_choice("Title")
         use_makefile = prompt_choice("Does your module require a makefile?", True)
 
+        use_docker = False
+
+        if not use_makefile:
+            use_docker = prompt_choice("Does your module require a docker container", True)
+
         module_name = title.lower().replace(" ", "_")
 
         call_command("startapp", module_name)
 
         self.initial_cleanup(module_name)
-        patch_module(module_name, title, use_makefile)
+        patch_module(module_name, title, use_makefile, use_docker)
 
         if use_makefile:
             # Create empty Makefile if requested.
             makefile_file = open(f"{module_name}/Makefile", "x")
             makefile_file.close()
+        elif use_docker:
+            # Create empty Dockerfile if requested.
+            dockerfile_file = open(f"{module_name}/Dockerfile", 'x')
+            dockerfile_file.close()
