@@ -16,9 +16,13 @@ Including another URLconf
 """
 
 from importlib import import_module
+import docker
 
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
+
+import docker.errors
+from revproxy.views import ProxyView
 
 urlpatterns = [
     path("", include("main.urls")),
@@ -28,12 +32,32 @@ urlpatterns = [
 # Import and register all task views in installed CTF modules.
 from main.common import fetch_ctf_modules
 from main.views import config_hints_view
+from main.management.commands.common import module_container_name
+
+client = docker.from_env()
 
 ctf_modules = fetch_ctf_modules()
 
 for ctf_module in ctf_modules:
-    import_module(f"{ctf_module.module.__name__}.views")
+    module_name = ctf_module.module.__name__
+    import_module(f"{module_name}.views")
 
+    try:
+        if ctf_module.use_docker:
+            container_name = module_container_name(module_name)
+
+            container = client.containers.get(container_name)
+            IPAddress = container.attrs["NetworkSettings"]["IPAddress"]
+
+            urlpatterns.append(
+                re_path(
+                    f"envs/{module_name}/(?P<path>.*)",
+                    ProxyView.as_view(upstream=f"http://{IPAddress}:8080"),
+                )
+            )
+    except (AttributeError, docker.errors.NotFound) as e:
+        pass
+    
 # Import MODULE_TASKS after being populated by the previous section imports.
 from main.decorators import MODULE_TASKS
 
