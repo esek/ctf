@@ -6,4 +6,4 @@ class CMemoryHijinks(AppConfig):
     name = "c_memory_hijinks"
     has_tasks = True
     display_name = "C Memory Hijinks"
-    makefile = True
+    use_makefile = True
