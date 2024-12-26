@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "revproxy.apps.RevProxyConfig",
     "c_memory_hijinks.apps.CMemoryHijinks",
+    "browser_devtools",
 ]
 
 MIDDLEWARE = [
