@@ -32,7 +32,7 @@ urlpatterns = [
 # Import and register all task views in installed CTF modules.
 from main.common import fetch_ctf_modules
 from main.views import config_hints_view
-from main.management.commands.common import module_container_name
+from main.management.commands._common import module_container_name
 
 client = docker.from_env()
 

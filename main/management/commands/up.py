@@ -4,7 +4,7 @@ import docker
 import docker.errors
 
 from main.common import fetch_ctf_modules
-from main.management.commands.common import DOCKER_NETWORK_ID, module_container_name
+from main.management.commands._common import DOCKER_NETWORK_ID, module_container_name
 from main.models import Task, TaskModule
 
 
