@@ -1,4 +1,10 @@
 from django.shortcuts import render
+from django.http import HttpRequest
+
 from main.decorators import define_task
 
+
 # Create your views here.
+@define_task(name="Watch your head!", clues="clues/watch_your_head.md")
+def watch_your_head(request: HttpRequest, context):
+    return render(request, "browser_devtools/watch_your_head.html", context)
