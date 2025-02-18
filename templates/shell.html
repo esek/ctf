@@ -76,7 +76,9 @@
     </div>
     {% endif %}
 
-    <div class="content bg-body-primary container-fluid">
+    <!-- Rescale the content size depending on if the side bar is present or not -->
+    <div class="content bg-body-primary container-fluid"
+        style="grid-column-end: end; grid-column-start: {% if module_tasks %} main {% else %} side {% endif %};">
         {% block content %}{% endblock %}
     </div>
 
