@@ -33,11 +33,14 @@ def get_base_context(request, include_tasks=True):
         tasks = Task.objects.all()
         attempts = TaskAttempt.objects.filter(user=user)
 
+        # Fetch all the passed tasks.
         passed_tasks = [a.task.id for a in attempts if a.passed]
         modules = [t.module for t in tasks]
 
+        # Collect tuple of tasks and their "passed" status, grouped by module.
         module_tasks = {
-            m: [(t, t in passed_tasks) for t in tasks if t.module == m] for m in modules
+            m: [(t, t.id in passed_tasks) for t in tasks if t.module == m]
+            for m in modules
         }
 
         context["module_tasks"] = module_tasks
