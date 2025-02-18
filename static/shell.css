@@ -11,18 +11,18 @@ body {
     grid-template-rows: [nav] min-content [main] auto [secret] min-content [end];
 }
 
-.ctf-navbar {
+.ctef-navbar {
     grid-column-start: side;
     grid-column-end: end;
     grid-row: nav;
 }
 
-.ctf-navbar-left {
+.ctef-navbar-left {
     display: flexbox;
     align-items: center;
 }
 
-.ctf-navbar-welcome {
+.ctef-navbar-welcome {
     margin-right: 10px;
 }
 
