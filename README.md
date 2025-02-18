@@ -5,4 +5,6 @@ More docs to come for adding new tasks etc.
 
 ## Documentation
 
+[Building](./docs/building.md)
+
 [Organizing tasks](./docs/organizing_tasks.md)
