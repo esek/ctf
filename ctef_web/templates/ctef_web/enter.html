@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block css %}
+{{ block.super }}
+{% load static %}
+<link href="{% static 'ctef_web/enter.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+
+<div class="enter-form-container">
+    <form action="/enter" method="post">
+        {% csrf_token %}
+        {{ form }}
+        <input type="submit" value="Enter" />
+    </form>
+</div>
+
+{% endblock %}

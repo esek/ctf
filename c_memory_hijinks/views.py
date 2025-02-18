@@ -1,9 +1,9 @@
 from django.shortcuts import render
 from django.http import HttpRequest
 
-from main.decorators import define_task
+from ctef_core.decorators import define_task
 
-from main.models import Task
+from ctef_core.models import Task
 
 
 # Create your views here.
