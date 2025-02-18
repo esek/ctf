@@ -27,7 +27,6 @@ body {
 }
 
 .content {
-    grid-column: main;
     grid-row: main;
 
     padding-top: 1%;
