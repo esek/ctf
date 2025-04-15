@@ -9,6 +9,22 @@ MAX_TASK_POINTS = 100
 
 
 # Create your models here.
+class Competition(models.Model):
+    name = models.CharField(max_length=500, unique=True, null=False)
+
+    def __str__(self):
+        return f'Competition "{self.name}"'
+
+
+class CompetitionParticipation(models.Model):
+    score = models.PositiveSmallIntegerField(default=0)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    competition = models.ForeignKey(Competition, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.user.username}\'s participation in competition "{self.competition.name}"'
+
+
 class TaskModule(models.Model):
     """A grouping of tasks with a common theme or technique."""
 
@@ -55,6 +71,7 @@ class TaskAttempt(models.Model):
     passed = models.BooleanField(default=False)
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    competition = models.ForeignKey(Competition, on_delete=models.CASCADE, null=None)
 
     def __str__(self) -> str:
         return f"{self.user.username}'s attempt on task '{self.task.name}'"

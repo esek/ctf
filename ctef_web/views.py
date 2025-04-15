@@ -3,9 +3,9 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import login, logout as logout_user
 
-from ctef_core.common import get_base_context
+from ctef_core.common import get_base_context, get_default_competition
 from ctef_core.decorators import TaskDesc
-from ctef_core.models import Task, TaskAttempt, TaskClue
+from ctef_core.models import Task, TaskAttempt, TaskClue, CompetitionParticipation
 
 from .forms import EnterForm
 
@@ -25,6 +25,14 @@ def tasks(request: HttpRequest):
 
 def leaderboard(request: HttpRequest):
     context = get_base_context(request, False)
+
+    default_competition = get_default_competition()
+    participants = CompetitionParticipation.objects.filter(
+        competition=default_competition
+    ).order_by("score")
+
+    context["participants"] = participants
+
     return render(request, "ctef_web/leaderboard.html", context)
 
 
