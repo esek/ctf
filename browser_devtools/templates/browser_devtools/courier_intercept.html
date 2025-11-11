@@ -1,12 +1,14 @@
 {% extends "ctef_web/task.html" %}
 
 {% block head %}
+{% load static %}
+<script src="{% static 'browser_devtools/courier_intercept.js' %}"></script>
 {% endblock %}
 
 {% block task %}
 
 {% load task %}
 
-
+<p>Test!</p>
 
 {% endblock %}

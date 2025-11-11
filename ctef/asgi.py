@@ -20,6 +20,8 @@ asgi_application = get_asgi_application()
 
 from ctef_core.routing import websocket_urlpatterns
 
+# TODO: Adapt this to forward websocket connections to container proxy as well 
+# https://channels.readthedocs.io/en/latest/topics/routing.html#
 application = ProtocolTypeRouter(
     {
         "http": asgi_application,

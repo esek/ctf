@@ -10,4 +10,4 @@ def watch_your_head(request: HttpRequest, context):
 
 @define_task(name="Courier intercept")
 def courier_intercept(request: HttpRequest, context):
-    return render(request, "browser_devtools/courier_intercept", context)
+    return render(request, "browser_devtools/courier_intercept.html", context)
