@@ -1,5 +1,7 @@
-import json
-from channels.generic.websocket import WebsocketConsumer
+import json, websockets, asyncio
+
+from channels.exceptions import DenyConnection
+from channels.generic.websocket import WebsocketConsumer, AsyncWebsocketConsumer
 
 from .models import Task
 from .process import CTFProcess
@@ -47,3 +49,44 @@ class TerminalConsumer(WebsocketConsumer):
     def send_bytes(self, bytes: bytes):
         decoded = bytes.decode()
         self.send(decoded)
+
+
+class ProxyConsumer(AsyncWebsocketConsumer):
+    """
+    Django Channels websockets consumer that forwards websocket connections to a Docker container.
+    Based on https://gist.github.com/brianglass/e3184341afe63ed348144753ee62dce5
+    """
+
+    def __init__(self, endpoint: str, *args: object, **kwargs: object) -> None:
+        """Create a new proxy consumer for a websocket server at the specified endpoint"""
+        super().__init__(*args, **kwargs)
+        self.endpoint = endpoint
+        self.upstream_socket = None
+        self.forward_upstream_task = None
+
+    async def connect(self) -> None:
+        # Attempt to connect to the endpoint to proxy
+        try:
+            self.upstream_socket = await websockets.connect(self.endpoint)
+        except websockets.InvalidURI:
+            print("The container endpoint was not reachable.")
+            raise DenyConnection()
+
+        # Accept the incoming connection with the same subprotocol.
+        await self.accept(self.upstream_socket.subprotocol)
+
+        self.forward_upstream_task = asyncio.create_task(self.forward_upstream())
+
+    async def forward_upstream(self):
+        try:
+            async for data in self.upstream_socket:
+                if hasattr(data, "decode"):
+                    await self.send(bytes_data=data)
+                else:
+                    await self.send(text_data=data)
+        except asyncio.exceptions.CancelledError:
+            # This is triggered by the consumer itself when the client connection is terminating.
+            await self.upstream_socket.close()
+        except websockets.ConnectionClosedError:
+            # The target probably closed the connection.
+            await self.close()
