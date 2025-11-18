@@ -29,6 +29,8 @@ urlpatterns = [
     path("admin/", admin.site.urls),
 ]
 
+wspatterns = []
+
 # Import and register all task views in installed CTF modules.
 from ctef_core.common import fetch_ctf_modules
 from ctef_web.views import config_hints_view
@@ -49,7 +51,17 @@ for ctf_module in ctf_modules:
             container = client.containers.get(container_name)
             IPAddress = container.attrs["NetworkSettings"]["IPAddress"]
 
-            urlpatterns.append(
+            try:
+                if ctf_module.container_protocol == "ws":
+                    pattern_collection = wspatterns
+                else:
+                    pattern_collection = urlpatterns
+            except:
+                pattern_collection = urlpatterns
+
+            # TODO: Maybe just writing a Proxy consumer would be the easiest.
+            # Or maybe extend ProxyView?
+            pattern_collection.append(
                 re_path(
                     f"envs/{module_name}/(?P<path>.*)",
                     ProxyView.as_view(upstream=f"http://{IPAddress}:8080"),
@@ -57,7 +69,7 @@ for ctf_module in ctf_modules:
             )
     except (AttributeError, docker.errors.NotFound) as e:
         pass
-    
+
 # Import MODULE_TASKS after being populated by the previous section imports.
 from ctef_core.decorators import MODULE_TASKS
 
