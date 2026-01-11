@@ -1,13 +1,17 @@
 from django.apps import apps
 from django.http import HttpRequest, HttpResponseBadRequest
-from django.contrib.auth.models import User
 
-from ctef_core.models import Task, TaskAttempt
+from ctef_core.models import Task, TaskAttempt, Competition, CompetitionParticipation
 from ctef_web.forms import SecretForm
 
 
 def get_module_key(module):
     return module.split(".")[0]
+
+
+def get_default_competition():
+    default_competition = Competition.objects.get(id=0)
+    return default_competition
 
 
 def fetch_ctf_modules(additional_flag=None):
@@ -49,13 +53,22 @@ def get_base_context(request, include_tasks=True):
 
 
 def validate_secret(attempt: TaskAttempt, secret: str) -> bool:
-    if attempt.task.secret == secret:
-        attempt.passed = True
-        attempt.save()
 
-        return True
-    else:
+    if attempt.task.secret != secret:
         return False
+
+    attempt.passed = True
+    attempt.save()
+
+    default_competition = get_default_competition()
+
+    participation, _ = CompetitionParticipation.objects.get_or_create(
+        user=attempt.user, competition=default_competition
+    )
+    participation.score += 1
+    participation.save()
+
+    return True
 
 
 def task_view_wrapper(view, slug):
@@ -67,9 +80,16 @@ def task_view_wrapper(view, slug):
         task = Task.objects.get(slug=slug)
         context["task"] = task
 
+        # Get the default competition
+        default_competition = get_default_competition()
+
         attempt, _ = TaskAttempt.objects.get_or_create(
-            task=task, user=user, defaults={"points": task.points}
+            task=task,
+            user=user,
+            defaults={"points": task.points},
+            competition=default_competition,
         )
+
         context["task_attempt"] = attempt
 
         if request.method == "POST":

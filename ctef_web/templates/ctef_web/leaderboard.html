@@ -4,4 +4,10 @@
 
 <p>Leaderboard!</p>
 
+<ol>
+    {% for participant in participants %}
+    <li>{{participant.user.username}} ({{participant.score}} points)</li>
+    {% endfor %}
+</ol>
+
 {% endblock %}
