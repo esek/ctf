@@ -32,7 +32,7 @@ PyYAML==6.0.2
 requests==2.32.4
 service-identity==24.1.0
 setuptools==78.1.1
-sqlparse==0.5.1
+sqlparse==0.5.4
 tomli==2.0.1
 Twisted==24.7.0
 txaio==23.1.1
